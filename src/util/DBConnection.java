@@ -143,7 +143,45 @@ public class Srent_DB {
 
     public static boolean updateCar(int car_id, String model, double daily_rent,
                                     double deposit, int mileage, String vehicle_status){
-        /******** what is newinfo **********/
+
+        private static final Set<String> VALID_STATUSES =
+                Set.of("available","rented","service","retired");
+
+        if (!VALID_STATUSES.contains(vehicleStatus)) {
+            System.out.println("Enter valid status: " + VALID_STATUSES);
+            return false;
+        }
+
+        else{
+            try {
+                conn = getConnection();
+                String sql;
+
+                String sql = """
+                              UPDATE reservations
+                                 SET model           = ?,
+                                     daily_rent      = ?,
+                                     deposit         = ?,
+                                     mileage         = ?,
+                                     vehicle_status  = ?
+                               WHERE car_id         = ?
+                            """;
+                ps = conn.prepareStatement(sql);
+                ps.setInt(1, car_id);
+                ps.setString(2, model);
+                ps.setDouble(3, daily_rent);
+                ps.setDouble(4, deposit);
+                ps.setInt(5, mileage);
+                ps.setString(6, vehicle_status);
+                ResultSet rs = ps.executeQuery();
+                conn.close();
+
+            } catch (SQLException e){
+                e.printStackTrace();
+                System.out.println("Error occured! \n");
+            }
+        }
+
     }
     public static boolean deleteCar(int carID){
         try {
