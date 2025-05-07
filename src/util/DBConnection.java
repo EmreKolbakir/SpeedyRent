@@ -74,7 +74,7 @@ public class Srent_DB {
             conn = getConnection();
             String sql;
 
-            sql = "INSERT INTO reserves VALUES(?,?) ";
+            sql = "INSERT INTO reserves(userID, carID) VALUES(?,?) ";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, userID);
             ps.setInt(2, carID);
@@ -106,12 +106,33 @@ public class Srent_DB {
             System.out.println("Error occured! \n");
         }
     }
+    // vehicle_status = ('available','rented','service','retired')
+    public static boolean addCar(int car_id, String model, double daily_rent,
+                                 double deposit, int mileage, String vehicle_status){
+        try {
+            conn = getConnection();
+            String sql;
 
-    public static boolean addCar(Object carInfo){
-        /******** what is car info **********/
+            sql = "INSERT INTO reservations(car_id, model, daily_rent, deposit, mileage, vehicle_status)" +
+                    " values(?,?,?,?,?,?) ";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, car_id);
+            ps.setString(2, model);
+            ps.setDouble(3, daily_rent);
+            ps.setDouble(4, deposit);
+            ps.setInt(5, mileage);
+            ps.setString(6, vehicle_status);
+            ResultSet rs = ps.executeQuery();
+            conn.close();
+
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Error occured! \n");
+        }
     }
 
-    public static boolean updateCar(int carID, Object newInfo){
+    public static boolean updateCar(int car_id, String model, double daily_rent,
+                                    double deposit, int mileage, String vehicle_status){
         /******** what is newinfo **********/
     }
     public static boolean deleteCar(int carID){
