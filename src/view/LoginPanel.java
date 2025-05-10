@@ -105,6 +105,9 @@ public class LoginPanel extends JPanel {
             if (role == UserRole.ADMIN) {
                 cardLayout.show(container, "admin");
             } else if (role == UserRole.CUSTOMER) {
+                // 1) Kullanıcı ID’sini CarListPanel’e geçiriyoruz
+                CarListPanel clp = new CarListPanel(cardLayout, container, userId);
+                container.add(clp, "carlist");
                 cardLayout.show(container, "carlist");
             }
         }

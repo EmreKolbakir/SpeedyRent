@@ -1,4 +1,3 @@
-// src/view/Main.java
 package view;
 
 import javax.swing.*;
@@ -35,6 +34,7 @@ public class Main {
             CardLayout cardLayout = new CardLayout();
             JPanel container  = new JPanel(cardLayout);
 
+
             // === Create panels ===
             LoginPanel    loginPanel   = new LoginPanel(cardLayout, container);
             CarListPanel  carListPanel = new CarListPanel(cardLayout, container);
@@ -43,6 +43,14 @@ public class Main {
             // === Add panels to the card container ===
             container.add(loginPanel,   "login");
             container.add(carListPanel, "carlist");
+
+            // === Panellerin oluşturulması ===
+            LoginPanel loginPanel = new LoginPanel(cardLayout, container);
+            AdminPanel adminPanel = new AdminPanel(cardLayout, container);
+
+            // === Panelleri karta ekle ===
+            container.add(loginPanel, "login");
+
             container.add(adminPanel,   "admin");
 
             // Set the container as the content pane of the frame.
