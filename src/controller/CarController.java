@@ -5,9 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Car;
 import util.Srent_DB;
-
+/**
+ * The CarController class provides methods to manage car-related operations in the database.
+ * It includes functionality to add, update, delete, and retrieve car information, as well as
+ * manage car specifications and availability.
+ */
 public class CarController {
-
+    /**
+     * Adds a new car to the database and links it to a specification.
+     *
+     * @param model The model of the car.
+     * @param dailyRent The daily rental price of the car.
+     * @param deposit The deposit amount for the car.
+     * @param mileage The mileage of the car.
+     * @param status The status of the car (e.g., "available", "reserved").
+     * @param specificationId The unique identifier of the car's specification.
+     * @return true if the car was successfully added, false otherwise.
+     */
     public static boolean addCar(String model, double dailyRent, double deposit, int mileage, String status, int specificationId) {
         Connection conn = null;
         PreparedStatement psCar = null;
@@ -53,7 +67,15 @@ public class CarController {
             try { if (conn != null) conn.close(); } catch (Exception ignored) {}
         }
     }
-
+    /**
+     * Updates the details of an existing car in the database.
+     *
+     * @param carId The unique identifier of the car to update.
+     * @param model The updated model of the car.
+     * @param dailyRent The updated daily rental price of the car.
+     * @param status The updated status of the car.
+     * @return true if the car was successfully updated, false otherwise.
+     */
     public static boolean updateCar(int carId, String model, double dailyRent, String status) {
         String sql = "UPDATE Car SET model = ?, daily_rent = ?, vehicle_status = ? WHERE car_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -69,6 +91,13 @@ public class CarController {
         }
     }
 
+    /**
+     * Assigns a specification to a car.
+     *
+     * @param carId The unique identifier of the car.
+     * @param specId The unique identifier of the specification to assign.
+     * @return true if the specification was successfully assigned, false otherwise.
+     */
     public static boolean assignSpecificationToCar(int carId, int specId) {
         String sql = "INSERT INTO has (car_id, specification_id) VALUES (?, ?)";
         try (Connection conn = Srent_DB.getConnection();
@@ -82,6 +111,13 @@ public class CarController {
         }
     }
 
+    /**
+     * Removes a specification from a car.
+     *
+     * @param carId The unique identifier of the car.
+     * @param specId The unique identifier of the specification to remove.
+     * @return true if the specification was successfully removed, false otherwise.
+     */
     public static boolean removeSpecificationFromCar(int carId, int specId) {
         String sql = "DELETE FROM has WHERE car_id = ? AND specification_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -95,6 +131,12 @@ public class CarController {
         }
     }
 
+    /**
+     * Deletes a car from the database, including all related data.
+     *
+     * @param carId The unique identifier of the car to delete.
+     * @return true if the car was successfully deleted, false otherwise.
+     */
     public static boolean deleteCar(int carId) {
         String deleteHasSql      = "DELETE FROM has WHERE car_id = ?";
         String deleteReservesSql = "DELETE FROM reserves WHERE car_id = ?";
@@ -137,6 +179,12 @@ public class CarController {
         }
     }
 
+    /**
+     * Retrieves the specification ID associated with a car.
+     *
+     * @param carId The unique identifier of the car.
+     * @return The specification ID, or -1 if not found.
+     */
     public static int getSpecificationIdForCar(int carId) {
         String sql = "SELECT specification_id FROM has WHERE car_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -153,7 +201,12 @@ public class CarController {
         return -1;
     }
 
-
+    /**
+     * Retrieves detailed information about a car by its unique identifier.
+     *
+     * @param carId The unique identifier of the car.
+     * @return A string representing the car's details, or "Car not found." if no car is found.
+     */
     public static String getCarById(int carId) {
         String sql = "SELECT c.model, c.daily_rent, c.deposit, c.mileage, c.vehicle_status, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
                 "FROM Car c " +
@@ -181,6 +234,12 @@ public class CarController {
         return "Car not found.";
     }
 
+    /**
+     * Checks if a car is available for rental.
+     *
+     * @param carId The unique identifier of the car.
+     * @return true if the car is available, false otherwise.
+     */
     public static boolean isCarAvailable(int carId) {
         String sql = "SELECT vehicle_status FROM Car WHERE car_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -196,6 +255,11 @@ public class CarController {
         return false;
     }
 
+    /**
+     * Retrieves a list of all reserved cars.
+     *
+     * @return A list of strings representing reserved cars.
+     */
     public static List<String> getAllReservedCars() {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT * FROM Car WHERE vehicle_status != 'available'";
@@ -217,6 +281,11 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of all cars in the database.
+     *
+     * @return A list of strings representing all cars.
+     */
     public static List<String> getAllCars() {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT * FROM Car";
@@ -238,6 +307,11 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of all cars as Car objects.
+     *
+     * @return A list of Car objects representing all cars.
+     */
     public static List<Car> getAllCarsAsObjects() {
         List<Car> cars = new ArrayList<>();
         String sql =
@@ -270,6 +344,11 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of all available cars.
+     *
+     * @return A list of strings representing available cars.
+     */
     public static List<String> getAllAvailableCars() {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT * FROM Car WHERE vehicle_status = 'available'";
@@ -290,6 +369,11 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of all available cars as Car objects.
+     *
+     * @return A list of Car objects representing available cars.
+     */
     public static List<Car> getAvailableCarsAsObjects() {
         List<Car> cars = new ArrayList<>();
         String sql =
@@ -323,6 +407,12 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of cars filtered by their status.
+     *
+     * @param status The status to filter cars by (e.g., "available", "reserved").
+     * @return A list of strings representing cars with the specified status.
+     */
     public static List<String> getCarsByStatus(String status) {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT * FROM Car WHERE vehicle_status = ?";
@@ -344,6 +434,12 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves a list of cars managed by a specific admin.
+     *
+     * @param adminId The unique identifier of the admin.
+     * @return A list of strings representing cars managed by the admin.
+     */
     public static List<String> getCarsManagedByAdmin(int adminId) {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT c.car_id, c.model, c.vehicle_status FROM Car c " +
@@ -365,6 +461,12 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves the specifications of a car.
+     *
+     * @param carId The unique identifier of the car.
+     * @return A list of strings representing the car's specifications.
+     */
     public static List<String> getCarSpecifications(int carId) {
         List<String> specs = new ArrayList<>();
         String sql = "SELECT vs.color, vs.fuel_type, vs.transmission_type, vs.seating_capacity " +
@@ -388,6 +490,19 @@ public class CarController {
         return specs;
     }
 
+    /**
+     * Filters cars based on various criteria.
+     *
+     * @param minRent The minimum daily rent.
+     * @param maxRent The maximum daily rent.
+     * @param minMileage The minimum mileage.
+     * @param maxMileage The maximum mileage.
+     * @param fuelType The fuel type of the car.
+     * @param transmissionType The transmission type of the car.
+     * @param minSeats The minimum seating capacity.
+     * @param maxSeats The maximum seating capacity.
+     * @return A list of strings representing cars that match the criteria.
+     */
     public static List<String> filterCars(Double minRent, Double maxRent, Integer minMileage, Integer maxMileage,
                                           String fuelType, String transmissionType, Integer minSeats, Integer maxSeats) {
         List<String> cars = new ArrayList<>();
@@ -454,6 +569,12 @@ public class CarController {
         return cars;
     }
 
+    /**
+     * Retrieves the rental history of a car.
+     *
+     * @param carId The unique identifier of the car.
+     * @return A list of strings representing the car's rental history.
+     */
     public static List<String> getCarHistory(int carId) {
         List<String> history = new ArrayList<>();
         String sql = "SELECT b.booking_id, b.start_date, b.end_date, b.booking_status, b.amount " +
@@ -479,6 +600,12 @@ public class CarController {
         return history;
     }
 
+    /**
+     * Retrieves the top rented cars, limited by the specified number.
+     *
+     * @param limit The maximum number of cars to retrieve.
+     * @return A list of strings representing the top rented cars.
+     */
     public static List<String> getTopRentedCars(int limit) {
         List<String> cars = new ArrayList<>();
         String sql = "SELECT c.car_id, c.model, COUNT(*) AS rental_count " +
@@ -500,7 +627,4 @@ public class CarController {
         }
         return cars;
     }
-
-
-
 }

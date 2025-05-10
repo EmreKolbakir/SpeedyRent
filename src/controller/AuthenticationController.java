@@ -7,8 +7,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import util.Srent_DB;
 
+/**
+ * Retrieves a list of active bookings that are confirmed and have not yet ended.
+ *
+ * @return A list of strings representing active bookings.
+ */
 public class AuthenticationController {
-
+    /**
+     * Enum representing user roles.
+     */
     public enum UserRole {
         ADMIN,
         CUSTOMER,
@@ -16,7 +23,11 @@ public class AuthenticationController {
     }
 
     /**
-     * user_id ve name ile kullanıcı girişi yapan statik metot
+     * Logs in a user by verifying their user ID and username.
+     *
+     * @param userId The unique identifier of the user.
+     * @param username The username of the user.
+     * @return The role of the user (ADMIN, CUSTOMER, or UNKNOWN).
      */
     public static UserRole login(int userId, String username) {
         String sql = "SELECT * FROM User WHERE user_id = ? AND username = ?";
@@ -77,7 +88,11 @@ public class AuthenticationController {
 
 
     /**
-     * Kullanıcı admin mi kontrolü
+     * Checks if a user is an admin.
+     *
+     * @param userId The unique identifier of the user.
+     * @param conn The database connection to use.
+     * @return true if the user is an admin, false otherwise.
      */
     private static boolean isAdmin(int userId, Connection conn) {
         String query = "SELECT * FROM Admin WHERE user_id = ?";
@@ -107,7 +122,11 @@ public class AuthenticationController {
     }
 
     /**
-     * Kullanıcı customer mı kontrolü
+     * Checks if a user is a customer.
+     *
+     * @param userId The unique identifier of the user.
+     * @param conn The database connection to use.
+     * @return true if the user is a customer, false otherwise.
      */
     private static boolean isCustomer(int userId, Connection conn) {
         String query = "SELECT * FROM Customer WHERE user_id = ?";
@@ -136,6 +155,18 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Registers a new customer in the database.
+     *
+     * @param firstName The first name of the customer.
+     * @param lastName The last name of the customer.
+     * @param username The username of the customer.
+     * @param email The email address of the customer.
+     * @param gender The gender of the customer.
+     * @param address The address of the customer.
+     * @param occupation The occupation of the customer.
+     * @return true if the customer was successfully registered, false otherwise.
+     */
     public static boolean registerCustomer(String firstName, String lastName, String username, String email, String gender, String address, String occupation) {
         Connection conn = null;
         PreparedStatement checkEmailStmt = null;
@@ -214,7 +245,18 @@ public class AuthenticationController {
         }
     }
 
-
+    /**
+     * Registers a new admin in the database.
+     *
+     * @param firstName The first name of the admin.
+     * @param lastName The last name of the admin.
+     * @param username The username of the admin.
+     * @param gender The gender of the admin.
+     * @param email The email address of the admin.
+     * @param address The address of the admin.
+     * @param salary The salary of the admin.
+     * @return true if the admin was successfully registered, false otherwise.
+     */
     public static boolean registerAdmin(String firstName, String lastName, String username, String gender, String email, String address, double salary) {
         Connection conn = null;
         PreparedStatement psUser = null;

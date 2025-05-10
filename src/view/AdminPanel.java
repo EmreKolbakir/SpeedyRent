@@ -8,6 +8,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Car;
 
+/**
+ * The AdminPanel class represents the admin interface for managing cars.
+ * It provides functionality to add, update, and delete cars, as well as
+ * display a list of cars in a table format.
+ */
 public class AdminPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel container;
@@ -19,18 +24,25 @@ public class AdminPanel extends JPanel {
     private JComboBox<String> fuelBox, transBox, colorBox, statusBox;
     private JButton addButton, deleteButton, updateButton;
 
+    /**
+     * Constructs the AdminPanel with the specified CardLayout and container.
+     *
+     * @param cardLayout The CardLayout used for navigation.
+     * @param container  The parent container for the panel.
+     */
     public AdminPanel(CardLayout cardLayout, JPanel container) {
         this.cardLayout = cardLayout;
         this.container = container;
         setLayout(new BorderLayout());
 
-        // === Top Panel (Form Area) ===
+        // Initialize and add the form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
 
+        // Initialize form fields
         modelField = new JTextField();
         rentField = new JTextField();
         seatField = new JTextField();
@@ -38,45 +50,42 @@ public class AdminPanel extends JPanel {
         fuelBox = new JComboBox<>(new String[]{"Gasoline", "Diesel", "Electric", "Hybrid"});
         transBox = new JComboBox<>(new String[]{"Automatic", "Manual"});
         colorBox = new JComboBox<>(new String[]{
-            "White", "Black", "Gray", "Silver", "Blue", "Red", "Brown",
-            "Green", "Beige", "Yellow", "Orange", "Gold", "Purple",
-            "Navy", "Maroon", "Bronze", "Turquoise", "Teal"
+                "White", "Black", "Gray", "Silver", "Blue", "Red", "Brown",
+                "Green", "Beige", "Yellow", "Orange", "Gold", "Purple",
+                "Navy", "Maroon", "Bronze", "Turquoise", "Teal"
         });
-        
-        statusBox = new JComboBox<>(new String[]{"available", "rented","service", "retired" });
 
-        // Row 0
+        statusBox = new JComboBox<>(new String[]{"available", "rented", "service", "retired"});
+
+        // Add form fields to the form panel
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Model:"), gbc);
         gbc.gridx = 1; gbc.gridy = 0; formPanel.add(modelField, gbc);
         gbc.gridx = 2; gbc.gridy = 0; formPanel.add(new JLabel("Transmission:"), gbc);
         gbc.gridx = 3; gbc.gridy = 0; formPanel.add(transBox, gbc);
 
-        // Row 1
         gbc.gridx = 0; gbc.gridy = 1; formPanel.add(new JLabel("Rent/Day:"), gbc);
         gbc.gridx = 1; gbc.gridy = 1; formPanel.add(rentField, gbc);
         gbc.gridx = 2; gbc.gridy = 1; formPanel.add(new JLabel("Seats:"), gbc);
         gbc.gridx = 3; gbc.gridy = 1; formPanel.add(seatField, gbc);
 
-        // Row 2
         gbc.gridx = 0; gbc.gridy = 2; formPanel.add(new JLabel("Fuel Type:"), gbc);
         gbc.gridx = 1; gbc.gridy = 2; formPanel.add(fuelBox, gbc);
         gbc.gridx = 2; gbc.gridy = 2; formPanel.add(new JLabel("Color:"), gbc);
         gbc.gridx = 3; gbc.gridy = 2; formPanel.add(colorBox, gbc);
 
-        // Row 3
         gbc.gridx = 0; gbc.gridy = 3; formPanel.add(new JLabel("Status:"), gbc);
         gbc.gridx = 1; gbc.gridy = 3; formPanel.add(statusBox, gbc);
 
         add(formPanel, BorderLayout.NORTH);
 
-        // === Table Panel ===
+        // Initialize and add the table panel
         String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Rent", "Status"};
         tableModel = new DefaultTableModel(columns, 0);
         carTable = new JTable(tableModel);
         carTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // === Button Panel ===
+        // Initialize and add the button panel
         JPanel buttonPanel = new JPanel();
         addButton = new JButton("Add");
         deleteButton = new JButton("Delete");
@@ -86,15 +95,19 @@ public class AdminPanel extends JPanel {
         buttonPanel.add(updateButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // === Events ===
+        // Add event listeners for buttons and table selection
         addButton.addActionListener(e -> onAddCar());
         deleteButton.addActionListener(e -> onDeleteCar());
         updateButton.addActionListener(e -> onUpdateCar());
         carTable.getSelectionModel().addListSelectionListener(e -> fillFormFromTable());
 
+        // Load cars into the table
         loadCars();
     }
 
+    /**
+     * Loads the list of cars from the CarController and populates the table.
+     */
     private void loadCars() {
         tableModel.setRowCount(0);
         List<Car> cars = CarController.getAllCarsAsObjects();
@@ -108,6 +121,9 @@ public class AdminPanel extends JPanel {
         }
     }
 
+    /**
+     * Fills the form fields with the data of the selected car in the table.
+     */
     private void fillFormFromTable() {
         int row = carTable.getSelectedRow();
         if (row == -1) return;
@@ -121,6 +137,9 @@ public class AdminPanel extends JPanel {
         statusBox.setSelectedItem(tableModel.getValueAt(row, 7).toString());
     }
 
+    /**
+     * Clears the form fields and deselects any selected row in the table.
+     */
     private void clearForm() {
         modelField.setText("");
         rentField.setText("");
@@ -132,6 +151,10 @@ public class AdminPanel extends JPanel {
         carTable.clearSelection();
     }
 
+    /**
+     * Handles the "Add" button click event to add a new car.
+     * Validates input fields and interacts with the controllers to add the car.
+     */
     private void onAddCar() {
         try {
             String model = modelField.getText().trim();
@@ -163,6 +186,10 @@ public class AdminPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the "Delete" button click event to delete the selected car.
+     * Prompts the user to select a car if none is selected.
+     */
     private void onDeleteCar() {
         int row = carTable.getSelectedRow();
         if (row == -1) {
@@ -179,6 +206,10 @@ public class AdminPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the "Update" button click event to update the selected car.
+     * Validates input fields and interacts with the controllers to update the car.
+     */
     private void onUpdateCar() {
         int row = carTable.getSelectedRow();
         if (row == -1) {

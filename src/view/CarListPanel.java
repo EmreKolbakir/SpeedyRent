@@ -9,28 +9,39 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The CarListPanel class represents the user interface for displaying and filtering
+ * a list of available cars. It allows users to apply filters, sort cars, and initiate
+ * the car rental process.
+ */
 public class CarListPanel extends JPanel {
-    private final int currentUserId;
+    private final int currentUserId; // ID of the currently logged-in user.
 
-    private final CardLayout cardLayout;
-    private final JPanel container;
+    private final CardLayout cardLayout; // Layout manager for navigating between panels.
+    private final JPanel container; // Parent container holding this panel.
 
+    private JTable carTable; // Table to display the list of cars.
+    private JTextField minPriceField, maxPriceField; // Fields for filtering by price range.
+    private JTextField minSeatField, maxSeatField; // Fields for filtering by seat capacity.
+    private JComboBox<String> fuelBox, transBox, colorBox, sortBox; // Dropdowns for filtering and sorting.
+    private JButton applyButton, resetButton, rentButton; // Buttons for applying filters, resetting, and renting.
 
-    private JTable carTable;
-    private JTextField minPriceField, maxPriceField;
-    private JTextField minSeatField, maxSeatField;
-    private JComboBox<String> fuelBox, transBox, colorBox, sortBox;
-    private JButton applyButton, resetButton, rentButton;
+    private List<Car> allCars; // List of all available cars.
 
-    private List<Car> allCars;
-
+    /**
+     * Constructs the CarListPanel with the specified parameters.
+     *
+     * @param cardLayout    The CardLayout for navigating between panels.
+     * @param container     The parent container holding this panel.
+     * @param currentUserId The ID of the currently logged-in user.
+     */
     public CarListPanel(CardLayout cardLayout, JPanel container, int currentUserId) {
         this.cardLayout = cardLayout;
         this.container = container;
-        this.currentUserId  = currentUserId;
+        this.currentUserId = currentUserId;
         setLayout(new BorderLayout());
 
-        // === Top Filter Panel ===
+        // Initialize the filter panel at the top.
         JPanel filterPanel = new JPanel(new GridLayout(5, 4, 10, 10));
 
         fuelBox = new JComboBox<>(new String[]{"All", "Gasoline", "Diesel", "Electric", "Hybrid"});
@@ -43,6 +54,7 @@ public class CarListPanel extends JPanel {
         minSeatField = new JTextField(8);
         maxSeatField = new JTextField(8);
 
+        // Add filter components to the filter panel.
         filterPanel.add(new JLabel("Fuel Type:"));
         filterPanel.add(fuelBox);
         filterPanel.add(new JLabel("Transmission Type:"));
@@ -73,7 +85,7 @@ public class CarListPanel extends JPanel {
 
         add(filterPanel, BorderLayout.NORTH);
 
-        // === Table Panel ===
+        // Initialize the table panel at the center.
         String[] columns = {"ID", "Model", "Fuel", "Transmission", "Seats", "Color", "Price", "Status"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         carTable = new JTable(model);
@@ -81,18 +93,18 @@ public class CarListPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(carTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Hide the ID column
+        // Hide the ID column.
         carTable.getColumnModel().getColumn(0).setMinWidth(0);
         carTable.getColumnModel().getColumn(0).setMaxWidth(0);
         carTable.getColumnModel().getColumn(0).setWidth(0);
 
-        // === Bottom Panel ===
+        // Initialize the bottom panel with the rent button.
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rentButton = new JButton("Rent");
         bottomPanel.add(rentButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // === Events ===
+        // Add event listeners for buttons and filters.
         applyButton.addActionListener(e -> applyFilters());
         resetButton.addActionListener(e -> {
             fuelBox.setSelectedIndex(0);
@@ -109,7 +121,7 @@ public class CarListPanel extends JPanel {
 
         loadCars();
 
-        // **BURAYA EKLE**
+        // Reload cars when the panel is shown.
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
@@ -118,11 +130,17 @@ public class CarListPanel extends JPanel {
         });
     }
 
+    /**
+     * Loads the list of available cars from the CarController and applies filters.
+     */
     private void loadCars() {
         allCars = CarController.getAvailableCarsAsObjects();
         applyFilters();
     }
 
+    /**
+     * Applies the selected filters and sorting to the list of cars.
+     */
     private void applyFilters() {
         String fuel = (String) fuelBox.getSelectedItem();
         String trans = (String) transBox.getSelectedItem();
@@ -164,6 +182,13 @@ public class CarListPanel extends JPanel {
         }
     }
 
+    /**
+     * Parses a string into a double. Returns a default value if parsing fails.
+     *
+     * @param text       The string to parse.
+     * @param defaultVal The default value to return if parsing fails.
+     * @return The parsed double or the default value.
+     */
     private double parseDouble(String text, double defaultVal) {
         try {
             return Double.parseDouble(text.trim());
@@ -172,6 +197,13 @@ public class CarListPanel extends JPanel {
         }
     }
 
+    /**
+     * Parses a string into an integer. Returns a default value if parsing fails.
+     *
+     * @param text       The string to parse.
+     * @param defaultVal The default value to return if parsing fails.
+     * @return The parsed integer or the default value.
+     */
     private int parseInt(String text, int defaultVal) {
         try {
             return Integer.parseInt(text.trim());
@@ -180,6 +212,10 @@ public class CarListPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles the "Rent" button click event. Navigates to the booking panel
+     * for the selected car.
+     */
     private void onRent() {
         int row = carTable.getSelectedRow();
         if (row == -1) {

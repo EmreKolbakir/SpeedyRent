@@ -6,8 +6,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CardController class provides methods to manage card-related operations in the database.
+ * It includes functionality to add, delete, update, and retrieve card information.
+ */
 public class CardController {
 
+    /**
+     * Adds a new card to the database and links it to a user.
+     *
+     * @param userId The unique identifier of the user to link the card to.
+     * @param brand The brand of the card (e.g., Visa, MasterCard).
+     * @param number The card number.
+     * @param expDate The expiration date of the card.
+     * @param nameOnCard The name printed on the card.
+     * @return true if the card was successfully added and linked to the user, false otherwise.
+     */
     public static boolean addCard(int userId, String brand, String number, String expDate, String nameOnCard) {
         Connection conn = null;
         PreparedStatement psCard = null;
@@ -47,6 +61,12 @@ public class CardController {
         return false;
     }
 
+    /**
+     * Deletes a card from the database.
+     *
+     * @param cardId The unique identifier of the card to delete.
+     * @return true if the card was successfully deleted, false otherwise.
+     */
     public static boolean deleteCard(int cardId) {
         String sql = "DELETE FROM Card WHERE card_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -59,6 +79,12 @@ public class CardController {
         }
     }
 
+    /**
+     * Retrieves a list of cards associated with a specific user.
+     *
+     * @param userId The unique identifier of the user.
+     * @return A list of strings representing the cards linked to the user.
+     */
     public static List<String> getCardsByUser(int userId) {
         List<String> cards = new ArrayList<>();
         String sql = "SELECT c.card_id, c.card_brand, c.card_number, c.exp_date, c.name_on_card " +
@@ -82,6 +108,16 @@ public class CardController {
         return cards;
     }
 
+    /**
+     * Updates the details of an existing card in the database.
+     *
+     * @param cardId The unique identifier of the card to update.
+     * @param brand The updated brand of the card.
+     * @param number The updated card number.
+     * @param expDate The updated expiration date of the card.
+     * @param nameOnCard The updated name printed on the card.
+     * @return true if the card was successfully updated, false otherwise.
+     */
     public static boolean updateCard(int cardId, String brand, String number, String expDate, String nameOnCard) {
         String sql = "UPDATE Card SET card_brand = ?, card_number = ?, exp_date = ?, name_on_card = ? WHERE card_id = ?";
         try (Connection conn = Srent_DB.getConnection();
@@ -98,6 +134,12 @@ public class CardController {
         }
     }
 
+    /**
+     * Retrieves the details of a specific card by its unique identifier.
+     *
+     * @param cardId The unique identifier of the card to retrieve.
+     * @return A string representing the card details, or "Card not found." if no card is found.
+     */
     public static String getCardById(int cardId) {
         String sql = "SELECT * FROM Card WHERE card_id = ?";
         try (Connection conn = Srent_DB.getConnection();

@@ -1,98 +1,109 @@
--- Veritabanı oluşturma
+-- Drop the database if it already exists to ensure a clean slate.
 DROP DATABASE IF EXISTS srent;
+
+-- Create a new database named 'srent'.
 CREATE DATABASE srent;
+
+-- Switch to the 'srent' database for subsequent operations.
 USE srent;
 
--- Kullanıcılar
+-- Create the 'user' table to store user information.
+-- Includes user ID, username, and password.
 CREATE TABLE user (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50),
-    password VARCHAR(50)
+                      user_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each user.
+                      username VARCHAR(50),                   -- Username of the user.
+                      password VARCHAR(50)                    -- Password of the user.
 );
 
--- Admin
+-- Create the 'Admin' table to store admin-specific information.
+-- Links to the 'user' table via a foreign key.
 CREATE TABLE Admin (
-    user_id INT PRIMARY KEY,
-    salary DOUBLE,
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+                       user_id INT PRIMARY KEY,                -- Unique identifier for the admin (same as user ID).
+                       salary DOUBLE,                          -- Salary of the admin.
+                       FOREIGN KEY (user_id) REFERENCES user(user_id) -- Foreign key linking to the 'user' table.
 );
 
--- Customer
+-- Create the 'Customer' table to store customer-specific information.
+-- Links to the 'user' table via a foreign key.
 CREATE TABLE Customer (
-    user_id INT PRIMARY KEY,
-    occupation VARCHAR(100),
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+                          user_id INT PRIMARY KEY,                -- Unique identifier for the customer (same as user ID).
+                          occupation VARCHAR(100),                -- Occupation of the customer.
+                          FOREIGN KEY (user_id) REFERENCES user(user_id) -- Foreign key linking to the 'user' table.
 );
 
--- Kart bilgisi (zorunlu değil ama 2'de vardı)
+-- Create the 'Card' table to store card information.
+-- Includes card details such as brand, number, expiration date, and name on the card.
 CREATE TABLE Card (
-    card_id INT AUTO_INCREMENT PRIMARY KEY,
-    card_brand ENUM('Visa','Mastercard','Maestro','Troy','Other'),
-    card_number CHAR(16),
-    exp_date DATE,
-    name_on_card VARCHAR(60)
+                      card_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each card.
+                      card_brand ENUM('Visa','Mastercard','Maestro','Troy','Other'), -- Card brand.
+                      card_number CHAR(16),                   -- Card number (16 characters).
+                      exp_date DATE,                          -- Expiration date of the card.
+                      name_on_card VARCHAR(60)                -- Name printed on the card.
 );
 
--- Teknik Özellikler
+-- Create the 'VehicleSpecification' table to store vehicle specifications.
+-- Includes details such as color, fuel type, transmission type, and seating capacity.
 CREATE TABLE VehicleSpecification (
-    specification_id INT AUTO_INCREMENT PRIMARY KEY,
-    color VARCHAR(20),
-    fuel_type VARCHAR(20),
-    transmission_type VARCHAR(20),
-    seating_capacity INT
+                                      specification_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each specification.
+                                      color VARCHAR(20),                               -- Color of the vehicle.
+                                      fuel_type VARCHAR(20),                           -- Fuel type of the vehicle.
+                                      transmission_type VARCHAR(20),                   -- Transmission type of the vehicle.
+                                      seating_capacity INT                             -- Seating capacity of the vehicle.
 );
 
--- Araçlar
+-- Create the 'Car' table to store car information.
+-- Includes details such as model, daily rent, deposit, mileage, and status.
 CREATE TABLE Car (
-    car_id INT AUTO_INCREMENT PRIMARY KEY,
-    model VARCHAR(50),
-    daily_rent DOUBLE,
-    deposit DOUBLE,
-    mileage INT,
-    vehicle_status VARCHAR(20)
+                     car_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each car.
+                     model VARCHAR(50),                     -- Model of the car.
+                     daily_rent DOUBLE,                     -- Daily rental price of the car.
+                     deposit DOUBLE,                        -- Deposit amount for the car.
+                     mileage INT,                           -- Mileage of the car.
+                     vehicle_status VARCHAR(20)             -- Status of the car (e.g., available, rented, etc.).
 );
 
--- has ilişkisi
+-- Create the 'has' table to establish a relationship between cars and their specifications.
 CREATE TABLE has (
-    car_id INT,
-    specification_id INT,
-    FOREIGN KEY (car_id) REFERENCES Car(car_id),
-    FOREIGN KEY (specification_id) REFERENCES VehicleSpecification(specification_id)
+                     car_id INT,                            -- Unique identifier of the car.
+                     specification_id INT,                  -- Unique identifier of the specification.
+                     FOREIGN KEY (car_id) REFERENCES Car(car_id), -- Foreign key linking to the 'Car' table.
+                     FOREIGN KEY (specification_id) REFERENCES VehicleSpecification(specification_id) -- Foreign key linking to the 'VehicleSpecification' table.
 );
 
--- manages ilişkisi
+-- Create the 'manages' table to establish a relationship between admins and cars they manage.
 CREATE TABLE manages (
-    user_id INT,
-    car_id INT,
-    FOREIGN KEY (car_id) REFERENCES Car(car_id)
+                         user_id INT,                           -- Unique identifier of the admin.
+                         car_id INT,                            -- Unique identifier of the car.
+                         FOREIGN KEY (car_id) REFERENCES Car(car_id) -- Foreign key linking to the 'Car' table.
 );
 
--- Rezervasyonlar
+-- Create the 'Booking' table to store booking information.
+-- Includes details such as start and end dates, status, deposit, amount, and drive option.
 CREATE TABLE Booking (
-    booking_id INT AUTO_INCREMENT PRIMARY KEY,
-    start_date DATE,
-    end_date DATE,
-    booking_status VARCHAR(20),
-    secure_deposit DOUBLE, -- booking için gerekli
-    amount DOUBLE,
-    drive_option ENUM('self','chauffeur') DEFAULT 'self',
-    reading INT,
-    date_out DATE
+                         booking_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each booking.
+                         start_date DATE,                           -- Start date of the booking.
+                         end_date DATE,                             -- End date of the booking.
+                         booking_status VARCHAR(20),                -- Status of the booking (e.g., confirmed, cancelled, etc.).
+                         secure_deposit DOUBLE,                     -- Deposit amount for the booking.
+                         amount DOUBLE,                             -- Total amount for the booking.
+                         drive_option ENUM('self','chauffeur') DEFAULT 'self', -- Drive option for the booking.
+                         reading INT,                               -- Odometer reading at the start of the booking.
+                         date_out DATE                              -- Date the car is taken out.
 );
 
--- makes ilişkisi (kullanıcı ile booking arasında)
+-- Create the 'makes' table to establish a relationship between users and their bookings.
 CREATE TABLE makes (
-    user_id INT,
-    booking_id INT,
-    PRIMARY KEY (user_id, booking_id),
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
+                       user_id INT,                               -- Unique identifier of the user.
+                       booking_id INT,                            -- Unique identifier of the booking.
+                       PRIMARY KEY (user_id, booking_id),         -- Composite primary key for the relationship.
+                       FOREIGN KEY (user_id) REFERENCES user(user_id), -- Foreign key linking to the 'user' table.
+                       FOREIGN KEY (booking_id) REFERENCES Booking(booking_id) -- Foreign key linking to the 'Booking' table.
 );
 
--- reserves ilişkisi
+-- Create the 'reserves' table to establish a relationship between bookings and cars.
 CREATE TABLE reserves (
-    booking_id INT,
-    car_id INT,
-    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id),
-    FOREIGN KEY (car_id) REFERENCES Car(car_id)
-);B;
+                          booking_id INT,                            -- Unique identifier of the booking.
+                          car_id INT,                                -- Unique identifier of the car.
+                          FOREIGN KEY (booking_id) REFERENCES Booking(booking_id), -- Foreign key linking to the 'Booking' table.
+                          FOREIGN KEY (car_id) REFERENCES Car(car_id) -- Foreign key linking to the 'Car' table.
+);
